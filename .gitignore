@@ -24,6 +24,8 @@ local.properties
 
 # Local Eclipse settings files
 *.settings
+*.project
+*.classpath
 
 # Android Gradle build folders
 build/
