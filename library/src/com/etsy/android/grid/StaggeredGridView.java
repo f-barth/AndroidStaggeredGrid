@@ -284,6 +284,7 @@ public class StaggeredGridView extends ExtendableListView {
         else {
             if (DBG) Log.d(TAG, "onMeasureChild BEFORE position:" + position +
                     " h:" + getMeasuredHeight());
+	        Log.d("de.stocard.stocard","child "+child.getTag());
             // measure it to the width of our column.
             int childWidthSpec = MeasureSpec.makeMeasureSpec(mColumnWidth, MeasureSpec.EXACTLY);
             int childHeightSpec;
