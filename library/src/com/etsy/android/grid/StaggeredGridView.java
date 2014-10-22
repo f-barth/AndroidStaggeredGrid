@@ -38,7 +38,7 @@ import java.util.Arrays;
 public class StaggeredGridView extends ExtendableListView {
 
     private static final String TAG = "StaggeredGridView";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private static final int DEFAULT_COLUMNS_PORTRAIT = 2;
     private static final int DEFAULT_COLUMNS_LANDSCAPE = 3;
@@ -409,8 +409,13 @@ public class StaggeredGridView extends ExtendableListView {
         }
 
         for (int i = 0; i < mColumnCount; i++) {
-            updateColumnTopIfNeeded(i, gridChildTop);
-            updateColumnBottomIfNeeded(i, gridChildBottom);
+//	        if(position % 3== 0){
+//		        updateAllColumnBottomIfNeeded(gridChildBottom);
+//		        updateAllColumnTopIfNeeded(gridChildTop);
+//	        }else{
+		        updateColumnBottomIfNeeded(i, gridChildBottom);
+		        updateColumnTopIfNeeded(i, gridChildTop);
+//	        }
         }
 
         super.onLayoutChild(child, position, flowDown,
@@ -431,11 +436,19 @@ public class StaggeredGridView extends ExtendableListView {
         int verticalMargins = childTopMargin + childBottomMargin;
 
         if (flowDown) {
-            gridChildTop = mColumnBottoms[column]; // the next items top is the last items bottom
+	        if(position % 3== 2){
+				gridChildTop = Math.max(mColumnBottoms[0],mColumnBottoms[1]);
+	        }else{
+		        gridChildTop = mColumnBottoms[column]; // the next items top is the last items bottom
+	        }
             gridChildBottom = gridChildTop + (getChildHeight(child) + verticalMargins);
         }
         else {
-            gridChildBottom = mColumnTops[column]; // the bottom of the next column up is our top
+	        if(position % 3== 2){
+		        gridChildBottom = Math.min(mColumnTops[0],mColumnTops[1]);
+	        }else{
+		        gridChildBottom = mColumnTops[column]; // the bottom of the next column up is our top
+	        }
             gridChildTop = gridChildBottom - (getChildHeight(child) + verticalMargins);
         }
 
@@ -449,8 +462,14 @@ public class StaggeredGridView extends ExtendableListView {
         GridLayoutParams layoutParams = (GridLayoutParams) child.getLayoutParams();
         layoutParams.column = column;
 
-        updateColumnBottomIfNeeded(column, gridChildBottom);
-        updateColumnTopIfNeeded(column, gridChildTop);
+//	    if(position % 3== 2){
+//		    updateAllColumnBottomIfNeeded(gridChildBottom);
+//		    updateAllColumnTopIfNeeded(gridChildTop);
+//	    }else{
+		    updateColumnBottomIfNeeded(column, gridChildBottom);
+		    updateColumnTopIfNeeded(column, gridChildTop);
+//	    }
+
 
         // subtract the margins before layout
         gridChildTop += childTopMargin;
@@ -489,8 +508,13 @@ public class StaggeredGridView extends ExtendableListView {
         }
 
         for (int i = 0; i < mColumnCount; i++) {
-            updateColumnTopIfNeeded(i, gridChildTop);
-            updateColumnBottomIfNeeded(i, gridChildBottom);
+//	        if(position % 3== 0){
+//		        updateAllColumnBottomIfNeeded(gridChildBottom);
+//		        updateAllColumnTopIfNeeded(gridChildTop);
+//	        }else{
+		        updateColumnBottomIfNeeded(i, gridChildBottom);
+		        updateColumnTopIfNeeded(i, gridChildTop);
+//	        }
         }
 
         super.onOffsetChild(child, position, flowDown, childrenLeft, gridChildTop);
@@ -507,14 +531,24 @@ public class StaggeredGridView extends ExtendableListView {
         int childBottomMargin = getChildBottomMargin();
         int verticalMargins = childTopMargin + childBottomMargin;
 
-        if (flowDown) {
-            gridChildTop = mColumnBottoms[column]; // the next items top is the last items bottom
-            gridChildBottom = gridChildTop + (getChildHeight(child) + verticalMargins);
-        }
-        else {
-            gridChildBottom = mColumnTops[column]; // the bottom of the next column up is our top
-            gridChildTop = gridChildBottom - (getChildHeight(child) + verticalMargins);
-        }
+
+	    if (flowDown) {
+		    if(position % 3== 2){
+			    gridChildTop = Math.max(mColumnBottoms[0],mColumnBottoms[1]);
+		    }else{
+			    gridChildTop = mColumnBottoms[column]; // the next items top is the last items bottom
+		    }
+		    gridChildBottom = gridChildTop + (getChildHeight(child) + verticalMargins);
+	    }
+	    else {
+		    if(position % 3== 2){
+			    gridChildBottom = Math.min(mColumnTops[0],mColumnTops[1]);
+		    }else{
+			    gridChildBottom = mColumnTops[column]; // the bottom of the next column up is our top
+		    }
+		    gridChildTop = gridChildBottom - (getChildHeight(child) + verticalMargins);
+	    }
+
 
         if (DBG) Log.d(TAG, "onOffsetChild position:" + position +
                 " column:" + column +
@@ -527,8 +561,13 @@ public class StaggeredGridView extends ExtendableListView {
         GridLayoutParams layoutParams = (GridLayoutParams) child.getLayoutParams();
         layoutParams.column = column;
 
-        updateColumnBottomIfNeeded(column, gridChildBottom);
-        updateColumnTopIfNeeded(column, gridChildTop);
+//	    if(position % 3== 0){
+//		    updateAllColumnBottomIfNeeded(gridChildBottom);
+//		    updateAllColumnTopIfNeeded(gridChildTop);
+//	    }else{
+		    updateColumnBottomIfNeeded(column, gridChildBottom);
+		    updateColumnTopIfNeeded(column, gridChildTop);
+//	    }
 
         super.onOffsetChild(child, position, flowDown, childrenLeft, gridChildTop + childTopMargin);
     }
@@ -577,6 +616,23 @@ public class StaggeredGridView extends ExtendableListView {
         if (childBottom > mColumnBottoms[column]) {
             mColumnBottoms[column] = childBottom;
         }
+    }
+    private void updateAllColumnTopIfNeeded(int childTop) {
+	    for (int i = 0; i < mColumnTops.length; i++) {
+		    int mColumnTop = mColumnTops[i];
+		    if (childTop > mColumnTop) {
+			    mColumnTops[i] = childTop;
+		    }
+	    }
+    }
+
+    private void updateAllColumnBottomIfNeeded(int childBottom) {
+	    for (int i = 0; i < mColumnBottoms.length; i++) {
+		    int mColumnTop = mColumnBottoms[i];
+		    if (childBottom > mColumnTop) {
+			    mColumnBottoms[i] = childBottom;
+		    }
+	    }
     }
 
     @Override
